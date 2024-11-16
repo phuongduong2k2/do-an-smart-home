@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Image} from 'react-native';
-import React from 'react';
+import React, {memo} from 'react';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -64,4 +64,4 @@ const ImageAnim = (props: Props) => {
   );
 };
 
-export default ImageAnim;
+export default memo(ImageAnim);

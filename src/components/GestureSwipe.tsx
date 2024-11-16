@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {LayoutChangeEvent, StyleSheet, View} from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {memo, useCallback, useEffect, useState} from 'react';
 import Padlock from '../assets/icons/padlock.svg';
 import PadUnLock from '../assets/icons/padunlock.svg';
 import Arrow from '../assets/icons/arrow.svg';
@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GestureSwipe;
+export default memo(GestureSwipe);

@@ -6,19 +6,24 @@
  */
 
 import React from 'react';
-import {SafeAreaView, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 
 import AppNavigation from './src/navigation';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Provider} from 'react-redux';
+import {store} from './src/redux';
 
 function App(): React.JSX.Element {
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      <SafeAreaView style={{flex: 1}}>
-        <StatusBar barStyle={'light-content'} />
-        <AppNavigation />
-      </SafeAreaView>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <SafeAreaProvider>
+          <StatusBar barStyle={'light-content'} />
+          <AppNavigation />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </Provider>
   );
 }
 

@@ -1,10 +1,11 @@
-import {StyleSheet, View} from 'react-native';
+import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import React from 'react';
 import Background from '../assets/icons/background.svg';
 import {BlurView} from '@react-native-community/blur';
 
 interface Props {
   children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
 }
 
 const AppContainer = (props: Props) => {
@@ -19,8 +20,8 @@ const AppContainer = (props: Props) => {
         style={styles.absolute}
         overlayColor="transparent"
         blurType="light"
-        blurAmount={10}>
-        <>{props.children}</>
+        blurAmount={3}>
+        <View style={[{flex: 1}, props.style]}>{props.children}</View>
       </BlurView>
     </View>
   );

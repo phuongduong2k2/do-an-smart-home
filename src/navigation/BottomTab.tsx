@@ -12,6 +12,7 @@ import QrCode from '../assets/icons/qr-code.svg';
 import Settings from '../assets/icons/settings.svg';
 import SmartPhone from '../assets/icons/smartphone.svg';
 import CustomTabBar from './CustomTabBar';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
@@ -44,10 +45,15 @@ export const listTab = [
 ];
 
 const BottomTab = () => {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       initialRouteName="HomeScreen"
-      tabBar={CustomTabBar}
+      tabBar={props => {
+        if (insets) {
+          return CustomTabBar({...props, insets});
+        }
+      }}
       screenOptions={{headerShown: false}}>
       {listTab.map(tab => (
         <Tab.Screen key={tab.name} name={tab.name} component={tab.component} />
