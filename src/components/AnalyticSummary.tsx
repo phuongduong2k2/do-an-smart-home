@@ -16,6 +16,7 @@ type Props = {
   name: string;
   start: boolean;
   image: string;
+  value: any;
 };
 
 const AnalyticSummary = (props: Props) => {

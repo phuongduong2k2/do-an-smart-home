@@ -178,7 +178,10 @@ const HomeScreen = () => {
         marginLeft: index % 2 !== 0 ? 20 : 0,
       }}
       start={analytic}
-      {...item}
+      value={item.key}
+      color={item.color}
+      name={item.name}
+      image={item.image}
     />
   );
 
@@ -224,6 +227,7 @@ const HomeScreen = () => {
           data={LIST_SENSOR}
           ItemSeparatorComponent={ItemSeparatorComponent}
           numColumns={2}
+          keyExtractor={item => item.key}
           renderItem={renderItemSensor}
         />
       </ScrollView>
