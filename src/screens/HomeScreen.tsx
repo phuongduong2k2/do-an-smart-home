@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Button,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import AppContainer from '../components/AppContainer';
@@ -14,6 +15,7 @@ import Controller, {TKeyDevices} from '../components/Controller';
 import {io, Socket} from 'socket.io-client';
 import SensorData, {TSensorData} from '../components/SensorData';
 import ModalConnect from '../components/ModalConnect';
+import moment from 'moment';
 
 let socket: Socket | null = null;
 
@@ -22,6 +24,7 @@ const HomeScreen = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [ipAddress, setIpAddress] = useState('');
   const [lightData, setLightData] = useState('');
+  const [isLightLoading, setIsLightLoading] = useState(false);
   const [data, setData] = useState<TSensorData>({
     rain: 0,
     temp: 0,
@@ -91,6 +94,7 @@ const HomeScreen = () => {
       if (newData.length === 4) {
         console.log(newData);
         setLightData(newData);
+        setIsLightLoading(false);
       }
     });
 
@@ -107,12 +111,11 @@ const HomeScreen = () => {
 
   const handleController = useCallback(
     (params: {key: TKeyDevices; value: boolean; id: number}) => {
-      const sendData = {
-        id: String(params.id),
-        value: String(params.value),
-      };
+      const sendData = `${params.id}${params.value}`;
+      console.log(sendData);
       if (params.key.includes('light')) {
         socket?.emit('set_light', sendData);
+        setIsLightLoading(true);
       }
       if (params.key.includes('door')) {
         socket?.emit('set_door', sendData);
@@ -159,8 +162,15 @@ const HomeScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <Button
+          title="test"
+          onPress={() => {
+            console.log(moment().add(30, 'minutes').format('y-M-D H:m:ss'));
+          }}
+        />
         <Controller
-          data={lightData}
+          lightData={lightData}
+          isLightLoading={isLightLoading}
           isConnceted={isConnected}
           onChange={handleController}
         />

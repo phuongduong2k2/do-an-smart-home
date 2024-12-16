@@ -25,7 +25,7 @@ const ModalConnect = (props: Props) => {
     isVisible,
     onDone,
   } = props;
-  const [ipAddress, setIpAddress] = useState(value);
+  const [ipAddress, setIpAddress] = useState('192.168.9.182:5000');
 
   return (
     <Modal

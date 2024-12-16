@@ -69,40 +69,33 @@ export const LIST_LIGHT: TListControl[] = [
 ];
 
 type Props = {
-  data?: string;
+  lightData?: string;
   isConnceted?: boolean;
   onChange: (params: {key: TKeyDevices; value: boolean; id: number}) => void;
-  isLoading?: boolean;
+  isLightLoading?: boolean;
 };
 
 const ItemSeparatorComponent = () => <View style={{height: 16}} />;
 const widthScreen = Dimensions.get('screen').width;
 
 const Controller = (props: Props) => {
-  const {isConnceted, onChange, isLoading, data} = props;
+  const {isConnceted, onChange, isLightLoading, lightData} = props;
   const [doorData, setDoorData] = useState({
     main_door: false,
     bed_door: false,
   });
 
-  const onToggleLight = useCallback(
-    (item: TListControl, index: number) => {
-      const status = !(data?.[index] === '1');
-      onChange({key: item.key, value: status, id: index});
+  const onToggle = useCallback(
+    (item: TListControl, index: number, status: boolean) => {
+      onChange({key: item.key, value: !status, id: index + 1});
+      if (item.key.includes('door')) {
+        setDoorData({
+          ...doorData,
+          [item.key]: !status,
+        });
+      }
     },
-    [data, onChange],
-  );
-
-  const onToggleDoor = useCallback(
-    (item: TListControl, index: number) => {
-      const status = !doorData[item.key as keyof typeof doorData];
-      setDoorData({
-        ...doorData,
-        [item.key]: status,
-      });
-      onChange({key: item.key, value: status, id: index});
-    },
-    [doorData, onChange],
+    [onChange, doorData],
   );
 
   const renderItemDoor: ListRenderItem<TListControl> = ({index, item}) => (
@@ -110,10 +103,9 @@ const Controller = (props: Props) => {
       connected={isConnceted}
       data={item}
       index={index}
-      isLoading={isLoading}
       value={doorData[item.key as keyof typeof doorData]}
       type={'swipe'}
-      onToggle={onToggleDoor}
+      onToggle={onToggle}
       style={{
         width: (widthScreen - 20 * 3) / 2,
         marginLeft: index % 2 !== 0 ? 20 : 0,
@@ -124,12 +116,12 @@ const Controller = (props: Props) => {
   const renderItemLight: ListRenderItem<TListControl> = ({index, item}) => (
     <QuickAction
       connected={isConnceted}
-      isLoading={isLoading}
+      isLoading={isLightLoading}
       data={item}
       index={index}
-      value={data?.[index] === '1'}
+      value={lightData?.[index] === '1'}
       type={'switch'}
-      onToggle={onToggleLight}
+      onToggle={onToggle}
       style={{
         width: (widthScreen - 20 * 3) / 2,
         marginLeft: index % 2 !== 0 ? 20 : 0,

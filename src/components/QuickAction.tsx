@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import React, {memo, useCallback, useState} from 'react';
+import React, {memo, useCallback} from 'react';
 import ImageAnim from './ImageAnim';
 import GestureSwipe from './GestureSwipe';
 import CustomSwitch from './CustomSwitch';
@@ -21,7 +21,7 @@ type Props = {
   isLoading?: boolean;
   connected?: boolean;
   type?: TAction;
-  onToggle?: (item: TListControl, index: number) => void;
+  onToggle?: (item: TListControl, index: number, status: boolean) => void;
   datasensor?: boolean;
   data?: TListControl;
   style?: StyleProp<ViewStyle>;
@@ -40,7 +40,6 @@ const QuickAction = (props: Props) => {
     data,
     index,
   } = props;
-  const [status, setStatus] = useState(value);
 
   const onAction = useCallback(() => {
     if (data && typeof index === 'number') {
@@ -48,10 +47,9 @@ const QuickAction = (props: Props) => {
         Alert.alert('Control Failed', 'Please connect to your server');
         return;
       }
-      setStatus(!status);
-      onToggle(data, index);
+      onToggle(data, index, value);
     }
-  }, [onToggle, data, index, connected, status]);
+  }, [onToggle, data, index, connected, value]);
 
   return (
     <View style={[styles.container, style]}>
@@ -87,12 +85,12 @@ const QuickAction = (props: Props) => {
         {!datasensor && typeof value === 'boolean' && (
           <>
             {type === 'swipe' ? (
-              <GestureSwipe value={status} onSwipeDone={onAction} />
+              <GestureSwipe value={value} onSwipeDone={onAction} />
             ) : (
               <View style={{width: '100%', alignItems: 'center'}}>
                 <CustomSwitch
                   width={80}
-                  value={status}
+                  value={value}
                   activeBgColor="#008C28"
                   inactiveBgColor="grey"
                   onPress={onAction}
@@ -128,6 +126,7 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     position: 'absolute',
+    zIndex: 1000,
   },
 });
 
