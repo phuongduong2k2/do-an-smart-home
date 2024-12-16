@@ -6,39 +6,19 @@ import {
   ViewStyle,
   Image,
 } from 'react-native';
-import React, {memo, useEffect, useState} from 'react';
-
-import * as Progress from 'react-native-progress';
+import React, {memo} from 'react';
+import AnimatedNumbers from 'react-native-animated-numbers';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
   color?: string;
   name: string;
-  start: boolean;
   image: string;
-  value: any;
+  value: number;
 };
 
 const AnalyticSummary = (props: Props) => {
-  const {style, color, name, start, image} = props;
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (start) {
-      interval = setInterval(() => {
-        if (progress === 1) {
-          setProgress(0);
-        } else {
-          setProgress(prev => prev + 0.2);
-        }
-      }, 500);
-    }
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [progress, start]);
+  const {style, name, image, value} = props;
 
   return (
     <View style={[styles.container, style]}>
@@ -49,7 +29,12 @@ const AnalyticSummary = (props: Props) => {
           uri: image,
         }}
       />
-      <Progress.Circle size={100} progress={progress} showsText color={color} />
+      <AnimatedNumbers
+        includeComma
+        animateToNumber={value}
+        animationDuration={300}
+        fontStyle={{fontSize: 30, fontWeight: 'bold'}}
+      />
     </View>
   );
 };

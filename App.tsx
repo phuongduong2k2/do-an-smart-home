@@ -19,7 +19,7 @@ function App(): React.JSX.Element {
     <Provider store={store}>
       <GestureHandlerRootView style={{flex: 1}}>
         <SafeAreaProvider>
-          <StatusBar barStyle={'light-content'} />
+          <StatusBar barStyle={'light-content'} backgroundColor={'black'} />
           <AppNavigation />
         </SafeAreaProvider>
       </GestureHandlerRootView>

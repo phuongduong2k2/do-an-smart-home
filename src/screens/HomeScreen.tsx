@@ -5,123 +5,30 @@ import {
   ScrollView,
   Image,
   StyleSheet,
-  FlatList,
-  Dimensions,
-  ListRenderItem,
+  TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import AppContainer from '../components/AppContainer';
-import QuickAction, {TAction} from '../components/QuickAction';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import AnalyticSummary from '../components/AnalyticSummary';
-import CustomSwitch from '../components/CustomSwitch';
+import Controller, {TKeyDevices} from '../components/Controller';
+import {io, Socket} from 'socket.io-client';
+import SensorData, {TSensorData} from '../components/SensorData';
+import ModalConnect from '../components/ModalConnect';
 
-type TListControl = {
-  name: string;
-  key: string;
-  type: TAction;
-  image: string;
-};
-
-type TListSensor = {
-  name: string;
-  key: string;
-  maxRange: number;
-  type: 'bar' | 'circle';
-  color?: string;
-  image: string;
-};
-
-export const LIST_DEVICE: TListControl[] = [
-  {
-    name: 'Front Door',
-    key: 'lockDoor',
-    type: 'swipe',
-    image:
-      'https://www.pirnar.in/pic/page/front-doors/wooden-models/premium-0160-model.png',
-  },
-  {
-    name: 'Mái Hiên',
-    key: 'ceil',
-    type: 'swipe',
-    image:
-      'https://funas.vn/wp-content/uploads/2024/05/mai-hien-mh02-300x300.png',
-  },
-  {
-    name: 'Đèn Ngủ',
-    key: 'lamp',
-    type: 'switch',
-    image:
-      'https://product.hstatic.net/200000539781/product/13_976d9ff0917c4fabadf0463359bdf984_large.png',
-  },
-  {
-    name: 'Đèn Khách',
-    key: 'livingLight',
-    type: 'switch',
-    image:
-      'https://cdn.pixabay.com/photo/2013/07/13/12/43/bulb-160207_1280.png',
-  },
-];
-
-export const LIST_SENSOR: TListSensor[] = [
-  {
-    name: 'Mưa',
-    key: 'rain',
-    maxRange: 1,
-    type: 'circle',
-    image:
-      'https://cdn.pixabay.com/animation/2023/09/07/17/09/17-09-50-395_512.gif',
-    color: 'red',
-  },
-  {
-    name: 'Nhiệt Độ',
-    key: 'tempature',
-    maxRange: 1,
-    type: 'circle',
-    image:
-      'https://media3.giphy.com/media/fFaIwKs1EcEmY9CPvG/giphy.gif?cid=6c09b9525gvj61dygphhdljbbckro7w20zk256pmswkwpogj&ep=v1_gifs_search&rid=giphy.gif&ct=g',
-    color: 'purple',
-  },
-  {
-    name: 'Độ Ẩm',
-    key: 'humidity',
-    maxRange: 1,
-    image: 'https://cdn-icons-gif.flaticon.com/11201/11201779.gif',
-    type: 'circle',
-    color: 'green',
-  },
-  {
-    name: 'Khí Gas',
-    key: 'gas',
-    image:
-      'https://static.wixstatic.com/media/600e73_90db2052880f4bfd934600e674aa99a8~mv2.gif',
-    maxRange: 1,
-    type: 'circle',
-  },
-  {
-    name: 'Bụi Mịn',
-    key: 'dust',
-    maxRange: 1,
-    type: 'circle',
-    image:
-      'https://img1.picmix.com/output/stamp/normal/5/8/6/8/448685_c9b9f.gif',
-    color: 'black',
-  },
-];
-
-const ItemSeparatorComponent = () => <View style={{height: 16}} />;
-
-const widthScreen = Dimensions.get('screen').width;
+let socket: Socket | null = null;
 
 const HomeScreen = () => {
-  const [controller, setController] = useState({
-    lockDoor: false,
-    ceil: false,
-    lamp: false,
-    livingLight: false,
+  const [isConnected, setIsConnected] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [ipAddress, setIpAddress] = useState('');
+  const [lightData, setLightData] = useState('');
+  const [data, setData] = useState<TSensorData>({
+    rain: 0,
+    temp: 0,
+    humi: 0,
+    pm10: 0,
+    pm25: 0,
   });
-
-  const [analytic, setAnalytic] = useState(false);
 
   const insets = useSafeAreaInsets();
 
@@ -151,85 +58,113 @@ const HomeScreen = () => {
     </View>
   );
 
-  const renderItemControl: ListRenderItem<TListControl> = ({index, item}) => (
-    <QuickAction
-      connected={false}
-      name={item.name}
-      imgSrc={item.image}
-      value={controller[item.key as keyof typeof controller]}
-      type={item.type}
-      onToggle={() => {
-        setController(prev => ({
-          ...prev,
-          [item.key]: !controller[item.key as keyof typeof controller],
-        }));
-      }}
-      style={{
-        width: (widthScreen - 20 * 3) / 2,
-        marginLeft: index % 2 !== 0 ? 20 : 0,
-      }}
-    />
-  );
+  useEffect(() => {
+    socket = io(`ws://${ipAddress}`, {
+      transports: ['websocket'],
+      reconnection: true,
+    });
 
-  const renderItemSensor: ListRenderItem<TListSensor> = ({index, item}) => (
-    <AnalyticSummary
-      style={{
-        width: (widthScreen - 20 * 3) / 2,
-        marginLeft: index % 2 !== 0 ? 20 : 0,
-      }}
-      start={analytic}
-      value={item.key}
-      color={item.color}
-      name={item.name}
-      image={item.image}
-    />
+    socket.on('connect', () => {
+      console.log('Connect success');
+      setIsConnected(true);
+      // handleData();
+    });
+
+    socket.on('connect_error', error => {
+      console.log('Connect Error ', error.message);
+      setIsConnected(false);
+    });
+
+    socket.on('disconnect', (reason, details) => {
+      console.log('Disconnect ', reason, details);
+      setIsConnected(false);
+    });
+
+    socket.on('sensor_data', (dataReceived: {data: TSensorData}) => {
+      // console.log('Received data ', dataReceived);
+      setData(dataReceived.data);
+    });
+
+    socket.on('light_data', (dataReceived: {data: string}) => {
+      const status = dataReceived.data;
+      const newData = status.slice(2, status.length - 1);
+      if (newData.length === 4) {
+        console.log(newData);
+        setLightData(newData);
+      }
+    });
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [ipAddress]);
+
+  const onBackdropPress = useCallback(() => {
+    setIsVisible(false);
+  }, []);
+
+  const handleController = useCallback(
+    (params: {key: TKeyDevices; value: boolean; id: number}) => {
+      const sendData = {
+        id: String(params.id),
+        value: String(params.value),
+      };
+      if (params.key.includes('light')) {
+        socket?.emit('set_light', sendData);
+      }
+      if (params.key.includes('door')) {
+        socket?.emit('set_door', sendData);
+      }
+    },
+    [],
   );
 
   return (
     <AppContainer style={{paddingTop: insets.top}}>
+      <ModalConnect
+        isVisible={isVisible}
+        onBackdropPress={onBackdropPress}
+        onSwipeComplete={onBackdropPress}
+        value={ipAddress}
+        onDone={value => setIpAddress(value)}
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingHorizontal: 20, paddingBottom: 150}}>
+        contentContainerStyle={styles.contentContainerStyle}>
         {renderHeader()}
-        <FlatList
-          scrollEnabled={false}
-          ListHeaderComponent={
-            <Text style={[styles.text, {marginVertical: 20}]}>
-              Quick Actions
+        <View>
+          <Text
+            style={[
+              styles.text,
+              {color: isConnected ? '#57f542' : '#f55442', fontSize: 25},
+            ]}>
+            Status: {isConnected ? 'Connected' : 'Disconnected'} {'\n'}
+            {ipAddress.length > 0 ? ipAddress : 'IP Address...'}
+          </Text>
+          <TouchableOpacity
+            style={{
+              height: 50,
+              borderWidth: 1,
+              backgroundColor: 'white',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 14,
+              marginVertical: 10,
+            }}
+            onPress={() => setIsVisible(true)}>
+            <Text style={{fontSize: 18, color: 'black'}}>
+              Add IP Address now
             </Text>
-          }
-          data={LIST_DEVICE}
-          ItemSeparatorComponent={ItemSeparatorComponent}
-          numColumns={2}
-          renderItem={renderItemControl}
+          </TouchableOpacity>
+        </View>
+        <Controller
+          data={lightData}
+          isConnceted={isConnected}
+          onChange={handleController}
         />
-        <FlatList
-          scrollEnabled={false}
-          ListHeaderComponent={
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <Text style={[styles.text, {marginVertical: 20}]}>
-                Sensor Analytics
-              </Text>
-              <CustomSwitch
-                width={70}
-                value={analytic}
-                onPress={() => {
-                  setAnalytic(!analytic);
-                }}
-              />
-            </View>
-          }
-          data={LIST_SENSOR}
-          ItemSeparatorComponent={ItemSeparatorComponent}
-          numColumns={2}
-          keyExtractor={item => item.key}
-          renderItem={renderItemSensor}
-        />
+        <SensorData data={data} />
       </ScrollView>
     </AppContainer>
   );
@@ -237,6 +172,7 @@ const HomeScreen = () => {
 
 const styles = StyleSheet.create({
   text: {color: 'white', fontSize: 28, fontWeight: '500'},
+  contentContainerStyle: {paddingHorizontal: 20, paddingBottom: 150},
 });
 
 export default HomeScreen;
