@@ -7,12 +7,15 @@ import {
   ViewStyle,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
-import React, {memo, useCallback} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import ImageAnim from './ImageAnim';
 import GestureSwipe from './GestureSwipe';
 import CustomSwitch from './CustomSwitch';
 import {TListControl} from './Controller';
+import Alarm from '../assets/icons/alarm.svg';
+import ModalDate, {TDateModal} from './ModalDate';
 
 export type TAction = 'swipe' | 'switch';
 
@@ -26,6 +29,8 @@ type Props = {
   data?: TListControl;
   style?: StyleProp<ViewStyle>;
   index?: number;
+  onSelectDate?: (date: Date, value: boolean, index: number) => void;
+  dateData?: TDateModal;
 };
 
 const QuickAction = (props: Props) => {
@@ -39,7 +44,11 @@ const QuickAction = (props: Props) => {
     style,
     data,
     index,
+    onSelectDate = () => {},
+    dateData,
   } = props;
+
+  const [visible, setVisible] = useState(false);
 
   const onAction = useCallback(() => {
     if (data && typeof index === 'number') {
@@ -53,6 +62,21 @@ const QuickAction = (props: Props) => {
 
   return (
     <View style={[styles.container, style]}>
+      <ModalDate
+        isVisible={visible}
+        onBackdropPress={() => {
+          setVisible(false);
+        }}
+        data={dateData}
+        onDone={(date: Date, state: boolean) => {
+          if (typeof index === 'number') {
+            onSelectDate(date, state, index);
+          }
+        }}
+        onSwipeComplete={() => {
+          setVisible(false);
+        }}
+      />
       {isLoading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator color={'green'} size={'large'} />
@@ -61,7 +85,7 @@ const QuickAction = (props: Props) => {
       <View style={{padding: 10, opacity: isLoading ? 0.2 : 1, height: '100%'}}>
         <View
           style={{
-            width: '40%',
+            width: '50%',
             height: 100,
           }}>
           <Text
@@ -87,7 +111,28 @@ const QuickAction = (props: Props) => {
             {type === 'swipe' ? (
               <GestureSwipe value={value} onSwipeDone={onAction} />
             ) : (
-              <View style={{width: '100%', alignItems: 'center'}}>
+              <View
+                style={{
+                  width: '100%',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setVisible(true);
+                  }}
+                  style={{
+                    borderRadius: 2,
+                    borderWidth: 1,
+                    height: 35,
+                    width: 35,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'white',
+                  }}>
+                  <Alarm />
+                </TouchableOpacity>
                 <CustomSwitch
                   width={80}
                   value={value}

@@ -6,7 +6,6 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Button,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import AppContainer from '../components/AppContainer';
@@ -15,7 +14,7 @@ import Controller, {TKeyDevices} from '../components/Controller';
 import {io, Socket} from 'socket.io-client';
 import SensorData, {TSensorData} from '../components/SensorData';
 import ModalConnect from '../components/ModalConnect';
-import moment from 'moment';
+import {TDateModal} from '../components/ModalDate';
 
 let socket: Socket | null = null;
 
@@ -24,7 +23,13 @@ const HomeScreen = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [ipAddress, setIpAddress] = useState('');
   const [lightData, setLightData] = useState('');
+  const [doorData, setDoorData] = useState('');
+  const [isDoorLoading, setIsDoorLoading] = useState(false);
   const [isLightLoading, setIsLightLoading] = useState(false);
+  const [schedule1, setSchedule1] = useState<TDateModal | undefined>(undefined);
+  const [schedule2, setSchedule2] = useState<TDateModal | undefined>(undefined);
+  const [schedule3, setSchedule3] = useState<TDateModal | undefined>(undefined);
+  const [schedule4, setSchedule4] = useState<TDateModal | undefined>(undefined);
   const [data, setData] = useState<TSensorData>({
     rain: 0,
     temp: 0,
@@ -62,6 +67,7 @@ const HomeScreen = () => {
   );
 
   useEffect(() => {
+    let old_door_data = '000';
     socket = io(`ws://${ipAddress}`, {
       transports: ['websocket'],
       reconnection: true,
@@ -73,8 +79,7 @@ const HomeScreen = () => {
       // handleData();
     });
 
-    socket.on('connect_error', error => {
-      console.log('Connect Error ', error.message);
+    socket.on('connect_error', () => {
       setIsConnected(false);
     });
 
@@ -84,8 +89,14 @@ const HomeScreen = () => {
     });
 
     socket.on('sensor_data', (dataReceived: {data: TSensorData}) => {
-      // console.log('Received data ', dataReceived);
+      console.log('Received data ', dataReceived);
       setData(dataReceived.data);
+      const getDoorData = `${dataReceived.data.servo1}${dataReceived.data.servo2}${dataReceived.data.servo3}`;
+      if (getDoorData !== old_door_data) {
+        setIsDoorLoading(false);
+        setDoorData(getDoorData);
+        old_door_data = getDoorData;
+      }
     });
 
     socket.on('light_data', (dataReceived: {data: string}) => {
@@ -95,6 +106,23 @@ const HomeScreen = () => {
         console.log(newData);
         setLightData(newData);
         setIsLightLoading(false);
+      }
+    });
+
+    socket.on('done_light', (dataReceived: {data: string}) => {
+      switch (Number(dataReceived.data)) {
+        case 1:
+          setSchedule1(undefined);
+          break;
+        case 2:
+          setSchedule2(undefined);
+          break;
+        case 3:
+          setSchedule3(undefined);
+          break;
+        case 4:
+          setSchedule4(undefined);
+          break;
       }
     });
 
@@ -109,6 +137,44 @@ const HomeScreen = () => {
     setIsVisible(false);
   }, []);
 
+  const onSetSchedule = useCallback(
+    (id: number, date: string, value: boolean, _date: Date) => {
+      console.log('set schedule', id, _date);
+      switch (id) {
+        case 0:
+          setSchedule1({
+            date: _date,
+            value,
+          });
+          break;
+        case 1:
+          setSchedule2({
+            date: _date,
+            value,
+          });
+          break;
+        case 2:
+          setSchedule3({
+            date: _date,
+            value,
+          });
+          break;
+        case 3:
+          setSchedule4({
+            date: _date,
+            value,
+          });
+          break;
+      }
+      socket?.emit('set_light_schedule', {
+        id: id + 1,
+        date,
+        value: String(value)[0],
+      });
+    },
+    [],
+  );
+
   const handleController = useCallback(
     (params: {key: TKeyDevices; value: boolean; id: number}) => {
       const sendData = `${params.id}${params.value}`;
@@ -119,6 +185,7 @@ const HomeScreen = () => {
       }
       if (params.key.includes('door')) {
         socket?.emit('set_door', sendData);
+        setIsDoorLoading(true);
       }
     },
     [],
@@ -162,17 +229,15 @@ const HomeScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        <Button
-          title="test"
-          onPress={() => {
-            console.log(moment().add(30, 'minutes').format('y-M-D H:m:ss'));
-          }}
-        />
         <Controller
           lightData={lightData}
+          doorData={doorData}
           isLightLoading={isLightLoading}
+          isDoorLoading={isDoorLoading}
           isConnceted={isConnected}
           onChange={handleController}
+          onSetSchedule={onSetSchedule}
+          dateData={[schedule1, schedule2, schedule3, schedule4]}
         />
         <SensorData data={data} />
       </ScrollView>

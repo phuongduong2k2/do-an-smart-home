@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
-import DevicesScreen from '../screens/DevicesScreen';
+import DevicesScreen from '../screens/CameraScreen';
 import ScanQrCodeScreen from '../screens/ScanQrCodeScreen';
 import SettingScreen from '../screens/SettingScreen';
 import AccountScreen from '../screens/AccountScreen';
@@ -10,7 +10,7 @@ import Home from '../assets/icons/home.svg';
 import User from '../assets/icons/user.svg';
 import QrCode from '../assets/icons/qr-code.svg';
 import Settings from '../assets/icons/settings.svg';
-import SmartPhone from '../assets/icons/smartphone.svg';
+import Cam from '../assets/icons/cam.svg';
 import CustomTabBar from './CustomTabBar';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -23,9 +23,9 @@ export const listTab = [
     icon: Home,
   },
   {
-    name: 'Devices',
+    name: 'Camera',
     component: DevicesScreen,
-    icon: SmartPhone,
+    icon: Cam,
   },
   {
     name: 'QrCode',

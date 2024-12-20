@@ -14,11 +14,14 @@ type Props = {
 };
 
 export type TSensorData = {
-  humi: number;
-  pm10: number;
-  pm25: number;
-  rain: number;
-  temp: number;
+  humi?: number;
+  pm10?: number;
+  pm25?: number;
+  rain?: number;
+  temp?: number;
+  servo1?: number;
+  servo2?: number;
+  servo3?: number;
 };
 
 type TListSensor = {
@@ -37,7 +40,7 @@ const LIST_SENSOR: TListSensor[] = [
     maxRange: 1,
     type: 'circle',
     image:
-      'https://cdn.pixabay.com/animation/2023/09/07/17/09/17-09-50-395_512.gif',
+      'https://hoatrangnguyen.com.vn/wp-content/uploads/2023/10/mua-pham-phuong-lan-1.jpg',
     color: 'red',
   },
   {
@@ -46,14 +49,14 @@ const LIST_SENSOR: TListSensor[] = [
     maxRange: 1,
     type: 'circle',
     image:
-      'https://media3.giphy.com/media/fFaIwKs1EcEmY9CPvG/giphy.gif?cid=6c09b9525gvj61dygphhdljbbckro7w20zk256pmswkwpogj&ep=v1_gifs_search&rid=giphy.gif&ct=g',
+      'https://congnghedoluong.com/wp-content/uploads/2020/03/11-427x400.png',
     color: 'purple',
   },
   {
     name: 'Bụi Mịn PM10',
     key: 'pm10',
     image:
-      'https://static.wixstatic.com/media/600e73_90db2052880f4bfd934600e674aa99a8~mv2.gif',
+      'https://thumbs.dreamstime.com/z/pm-text-cloud-smoke-pattern-pollution-dust-concept-design-illustration-isolated-float-dark-sky-background-vector-eps-pm-text-142467731.jpg',
     maxRange: 1,
     type: 'circle',
   },
@@ -62,15 +65,15 @@ const LIST_SENSOR: TListSensor[] = [
     key: 'pm25',
     maxRange: 1,
     type: 'circle',
-    image:
-      'https://img1.picmix.com/output/stamp/normal/5/8/6/8/448685_c9b9f.gif',
+    image: 'https://kosmen.vn/upload/images/bui-min-pm-la-gi-1.jpg',
     color: 'black',
   },
   {
     name: 'Độ Ẩm',
     key: 'humi',
     maxRange: 1,
-    image: 'https://cdn-icons-gif.flaticon.com/11201/11201779.gif',
+    image:
+      'https://maydochuyendung.com/img/uploads/images/may-do-do-am-khong-khi/do-am-min.jpg',
     type: 'circle',
     color: 'green',
   },
@@ -95,7 +98,7 @@ const SensorData = (props: Props) => {
         width: (widthScreen - 20 * 3) / 2,
         marginLeft: index % 2 !== 0 ? 20 : 0,
       }}
-      value={data[item.key as keyof typeof data]}
+      value={data[item.key as keyof typeof data] ?? 0}
       color={item.color}
       name={item.name}
       image={item.image}

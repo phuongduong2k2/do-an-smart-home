@@ -39,7 +39,7 @@ const CustomTabBar = (tabProps: Props) => {
                 key={route.key}
                 style={styles.tab}
                 onPress={() => handleNavigation(route.name)}>
-                <Icon fill={'white'} />
+                <Icon />
                 <Text style={styles.label}>{route.name}</Text>
               </TouchableOpacity>
             );
