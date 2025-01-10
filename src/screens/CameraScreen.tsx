@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Text, View} from 'react-native';
 import React from 'react';
-import AppContainer from '../components/AppContainer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
+import {useAppSelector} from '../hooks';
 
 const jsCode = `
     const toggleStreamButton = document.getElementById('toggle-stream');
@@ -24,22 +24,28 @@ const jsCode = `
 
 const CameraScreen = () => {
   const insets = useSafeAreaInsets();
+  const {ipAddress} = useAppSelector(state => state.app);
 
   return (
-    <AppContainer style={{paddingTop: insets.top}}>
+    // <AppContainer style={{paddingTop: insets.top}}>
+    <View style={{flex: 1, paddingTop: insets.top, backgroundColor: '#181818'}}>
       <Text style={{color: 'white', fontSize: 28, fontWeight: '500'}}>
         Surveillance Camera
       </Text>
+      <Text style={{color: 'white'}}>
+        Running on IP:{' '}
+        {ipAddress && ipAddress?.slice(0, ipAddress.length - 9) + '.236'}
+      </Text>
       <View style={{flex: 1, backgroundColor: '#181818'}}>
-        {/* <View style={{height: '55%'}}> */}
         <WebView
-          source={{uri: 'http://192.168.9.236/ '}}
+          style={{flex: 1}}
+          source={{uri: `${ipAddress?.slice(0, ipAddress.length - 5)}.236/`}}
           injectedJavaScript={jsCode}
           javaScriptEnabled={true}
         />
-        {/* </View> */}
       </View>
-    </AppContainer>
+    </View>
+    // </AppContainer>
   );
 };
 

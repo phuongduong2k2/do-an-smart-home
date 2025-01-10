@@ -15,13 +15,15 @@ import {io, Socket} from 'socket.io-client';
 import SensorData, {TSensorData} from '../components/SensorData';
 import ModalConnect from '../components/ModalConnect';
 import {TDateModal} from '../components/ModalDate';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import {setIpAddress} from '../redux/slice';
 
 let socket: Socket | null = null;
 
 const HomeScreen = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [ipAddress, setIpAddress] = useState('');
+  const {ipAddress} = useAppSelector(state => state.app);
   const [lightData, setLightData] = useState('');
   const [doorData, setDoorData] = useState('');
   const [isDoorLoading, setIsDoorLoading] = useState(false);
@@ -38,6 +40,7 @@ const HomeScreen = () => {
     pm25: 0,
   });
 
+  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
 
   const renderHeader = () => (
@@ -197,8 +200,11 @@ const HomeScreen = () => {
         isVisible={isVisible}
         onBackdropPress={onBackdropPress}
         onSwipeComplete={onBackdropPress}
-        value={ipAddress}
-        onDone={value => setIpAddress(value)}
+        value={ipAddress ?? ''}
+        onDone={value => {
+          dispatch(setIpAddress(value));
+          console.log(value);
+        }}
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -211,7 +217,7 @@ const HomeScreen = () => {
               {color: isConnected ? '#57f542' : '#f55442', fontSize: 25},
             ]}>
             Status: {isConnected ? 'Connected' : 'Disconnected'} {'\n'}
-            {ipAddress.length > 0 ? ipAddress : 'IP Address...'}
+            {ipAddress && ipAddress.length > 0 ? ipAddress : 'IP Address...'}
           </Text>
           <TouchableOpacity
             style={{

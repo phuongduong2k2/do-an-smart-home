@@ -42,11 +42,11 @@ const LIST_DOOR: TListControl[] = [
     image:
       'https://remminhdang.com/wp-content/uploads/2024/02/Rem-Vai-Gia-Bao-Nhieu-1m-Dat-May-Rem-Cua-Tai-Minh-Dang-Ma-BYG27-12-5.jpg',
   },
-  // {
-  //   name: 'Canopy',
-  //   key: 'canopy_door',
-  //   image: 'https://phuongtoan.vn/upload/images/mai%20hien(5).jpg',
-  // },
+  {
+    name: 'Canopy',
+    key: 'canopy_door',
+    image: 'https://phuongtoan.vn/upload/images/mai%20hien(5).jpg',
+  },
 ];
 
 type Props = {
@@ -82,32 +82,32 @@ const Controller = (props: Props) => {
 
   const LIST_LIGHT: TListControl[] = [
     {
-      name: 'Đèn Phòng Ngủ',
-      key: 'light_bed_room',
-      dateData: dateData[0],
-      image:
-        'https://i.pinimg.com/originals/fc/87/85/fc87855c316d3d587fc184cbe3a0d2d4.jpg',
-    },
-    {
-      name: 'Đèn Khách',
+      name: 'Đèn Khách', // 1
       key: 'light_living_room',
-      dateData: dateData[1],
       image:
         'https://fancyhouse-design.com/wp-content/uploads/2024/03/Warm-wood-tones-add-a-cozy-touch-to-the-modern-living-room-enhancing-its-inviting-atmosphere.jpg',
+      dateData: dateData[0],
     },
     {
-      name: 'Đèn Nhà Vệ Sinh',
-      key: 'light_wc_room',
-      dateData: dateData[2],
-      image:
-        'https://i.pinimg.com/474x/5c/d9/bd/5cd9bdeb45508e0117731866799357c4.jpg',
-    },
-    {
-      name: 'Đèn Phòng Bếp',
+      name: 'Đèn Phòng Bếp', // 2
       key: 'light_kitchen',
-      dateData: dateData[3],
       image:
         'https://hips.hearstapps.com/hmg-prod/images/rebel-builders-rebelbuilders-com-lara-kimmerer-larakimmerer-com-2-lara-kimmerer-6580b6737d1b3.jpg?crop=0.591xw:0.887xh;0.240xw,0.106xh&resize=1200:*',
+      dateData: dateData[1],
+    },
+    {
+      name: 'Đèn Phòng Ngủ', //3
+      key: 'light_bed_room',
+      image:
+        'https://i.pinimg.com/originals/fc/87/85/fc87855c316d3d587fc184cbe3a0d2d4.jpg',
+      dateData: dateData[2],
+    },
+    {
+      name: 'Đèn Nhà Vệ Sinh', // 4
+      key: 'light_wc_room',
+      image:
+        'https://i.pinimg.com/474x/5c/d9/bd/5cd9bdeb45508e0117731866799357c4.jpg',
+      dateData: dateData[3],
     },
   ];
 

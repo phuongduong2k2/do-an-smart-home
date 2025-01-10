@@ -6,8 +6,9 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import Modal from 'react-native-modal';
+import {useAppSelector} from '../hooks';
 
 type Props = {
   value: string;
@@ -25,14 +26,22 @@ const ModalConnect = (props: Props) => {
     isVisible,
     onDone,
   } = props;
-  const [ipAddress, setIpAddress] = useState('192.168.9.182:5000');
+
+  const {ipAddress} = useAppSelector(state => state.app);
+  const [ipAddressValue, setIpAddressValue] = useState('');
+
+  useEffect(() => {
+    if (ipAddress) {
+      setIpAddressValue(ipAddress);
+    }
+  }, [ipAddress]);
 
   return (
     <Modal
       backdropTransitionOutTiming={0}
       onSwipeComplete={onSwipeComplete}
       onModalHide={() => {
-        setIpAddress(value);
+        setIpAddressValue(value);
       }}
       swipeDirection={'down'}
       isVisible={isVisible}
@@ -45,10 +54,10 @@ const ModalConnect = (props: Props) => {
         </Text>
         <ScrollView style={{flex: 1}}>
           <TextInput
-            value={ipAddress}
+            value={ipAddressValue}
             placeholder="Enter IP Address"
             style={{borderWidth: 1, borderRadius: 14, marginTop: 10}}
-            onChangeText={text => setIpAddress(text)}
+            onChangeText={text => setIpAddressValue(text)}
           />
         </ScrollView>
         <View style={{flexDirection: 'row'}}>
@@ -62,7 +71,7 @@ const ModalConnect = (props: Props) => {
             style={[styles.btn, {backgroundColor: '#074799'}]}
             onPress={() => {
               onBackdropPress();
-              onDone?.(ipAddress);
+              onDone?.(ipAddressValue);
             }}>
             <Text style={[styles.btnText, {color: 'white'}]}>Connect</Text>
           </TouchableOpacity>
