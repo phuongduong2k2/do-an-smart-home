@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Text, View} from 'react-native';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import {useAppSelector} from '../hooks';
@@ -26,6 +26,14 @@ const CameraScreen = () => {
   const insets = useSafeAreaInsets();
   const {ipAddress} = useAppSelector(state => state.app);
 
+  const cameraHost = useMemo(() => {
+    if (ipAddress && ipAddress?.length > 0) {
+      const splitValue = ipAddress.split('.');
+      return `${splitValue[0]}.${splitValue[1]}.${splitValue[2]}.236`;
+    }
+    return '';
+  }, [ipAddress]);
+
   return (
     // <AppContainer style={{paddingTop: insets.top}}>
     <View style={{flex: 1, paddingTop: insets.top, backgroundColor: '#181818'}}>
@@ -39,7 +47,7 @@ const CameraScreen = () => {
       <View style={{flex: 1, backgroundColor: '#181818'}}>
         <WebView
           style={{flex: 1}}
-          source={{uri: `${ipAddress?.slice(0, ipAddress.length - 5)}.236/`}}
+          source={{uri: cameraHost}}
           injectedJavaScript={jsCode}
           javaScriptEnabled={true}
         />

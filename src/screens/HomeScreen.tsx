@@ -38,6 +38,8 @@ const HomeScreen = () => {
     humi: 0,
     pm10: 0,
     pm25: 0,
+    smoke: 0,
+    gas: 0,
   });
 
   const dispatch = useAppDispatch();

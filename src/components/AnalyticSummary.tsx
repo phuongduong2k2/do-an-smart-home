@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import React, {memo} from 'react';
 import AnimatedNumbers from 'react-native-animated-numbers';
+import * as Progress from 'react-native-progress';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -15,10 +16,12 @@ type Props = {
   name: string;
   image: string;
   value: number;
+  haveProgress?: boolean;
+  progress?: number;
 };
 
 const AnalyticSummary = (props: Props) => {
-  const {style, name, image, value} = props;
+  const {style, name, image, value, haveProgress, color, progress = 0} = props;
 
   return (
     <View style={[styles.container, style]}>
@@ -29,12 +32,23 @@ const AnalyticSummary = (props: Props) => {
           uri: image,
         }}
       />
+
       <AnimatedNumbers
         includeComma
         animateToNumber={value}
         animationDuration={300}
         fontStyle={{fontSize: 30, fontWeight: 'bold'}}
       />
+
+      {haveProgress && (
+        <Progress.Circle
+          size={70}
+          progress={progress}
+          showsText
+          color={color}
+          textStyle={{fontSize: 20, fontWeight: '600'}}
+        />
+      )}
     </View>
   );
 };
