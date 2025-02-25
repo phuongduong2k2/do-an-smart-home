@@ -1,5 +1,10 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+![CleanShot 2025-02-25 at 23 45 33@2x](https://github.com/user-attachments/assets/3ec387d3-2761-4270-ab8e-0f84cd7414d7)
+
+# Design Figma
+https://www.figma.com/design/s4Wl4Ld7Q6nBzZlLfiIbG1/Smart-Home-Control-App-UI-design-(Community)?node-id=5-8&p=f&t=gUBv6g4rDc039Ygg-0
+
 # Getting Started
 
 >**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
